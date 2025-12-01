@@ -24,8 +24,6 @@ export class Floor {
 
   private _mesh!: Mesh;
 
-  public collider!: ColliderDesc;
-
   private _setGeometry = () => {
     this._geometry = new BoxGeometry(box.hx, box.hy, box.hz);
   };
@@ -45,7 +43,7 @@ export class Floor {
     const rigidBodyDesc = RigidBodyDesc.fixed();
     const rigidBody = this._experience.physics.instance.createRigidBody(rigidBodyDesc);
 
-    this.collider = ColliderDesc.cuboid(box.hx / 2.0, box.hy / 2.0, box.hz / 2.0);
-    this._experience.physics.instance.createCollider(this.collider, rigidBody);
+    const collider = ColliderDesc.cuboid(box.hx / 2.0, box.hy / 2.0, box.hz / 2.0);
+    this._experience.physics.instance.createCollider(collider, rigidBody);
   };
 }
