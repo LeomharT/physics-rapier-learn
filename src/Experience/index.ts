@@ -68,6 +68,7 @@ export default class Experience {
 
     // World
     this.physics.update();
+    this.physics.instance.debugRender();
     this.world.update();
   };
 

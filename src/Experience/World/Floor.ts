@@ -2,6 +2,12 @@ import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d';
 import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
 import type Experience from '..';
 
+const box = {
+  hx: 5.0,
+  hy: 0.1,
+  hz: 5.0,
+};
+
 export class Floor {
   constructor() {
     this._setGeometry();
@@ -21,13 +27,12 @@ export class Floor {
   public collider!: ColliderDesc;
 
   private _setGeometry = () => {
-    this._geometry = new BoxGeometry(5, 0.12, 5);
+    this._geometry = new BoxGeometry(box.hx, box.hy, box.hz);
   };
 
   private _setMaterial = () => {
     this._material = new MeshBasicMaterial({
       color: '#002766',
-      wireframe: true,
     });
   };
 
@@ -40,7 +45,7 @@ export class Floor {
     const rigidBodyDesc = RigidBodyDesc.fixed();
     const rigidBody = this._experience.physics.instance.createRigidBody(rigidBodyDesc);
 
-    this.collider = ColliderDesc.cuboid(5.0, 0.12, 5.0);
+    this.collider = ColliderDesc.cuboid(box.hx / 2.0, box.hy / 2.0, box.hz / 2.0);
     this._experience.physics.instance.createCollider(this.collider, rigidBody);
   };
 }

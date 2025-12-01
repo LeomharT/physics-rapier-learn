@@ -13,7 +13,7 @@ export class World extends EventDispatcher {
 
     this.test = new Mesh(
       new SphereGeometry(0.1, 32, 32),
-      new MeshBasicMaterial({ color: 'blue', wireframe: true })
+      new MeshBasicMaterial({ color: '#722ed1', wireframe: true })
     );
     this.test.position.set(0, 1, 0);
     this._experience.scene.add(this.test);
@@ -24,7 +24,7 @@ export class World extends EventDispatcher {
 
     const rigidBody = ColliderDesc.ball(0.1);
     rigidBody.setMass(1.0);
-    rigidBody.setRestitution(0.95);
+    rigidBody.setRestitution(1.05);
 
     this._experience.physics.instance.createCollider(rigidBody, this._rigidBody);
   }

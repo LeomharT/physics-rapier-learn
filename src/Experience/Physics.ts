@@ -1,9 +1,21 @@
 import { World as RapierWorld } from '@dimforge/rapier3d';
+import { BufferAttribute, BufferGeometry, LineBasicMaterial, LineSegments } from 'three';
+import type Experience from '.';
 
 export class Physics {
   constructor() {
+    this._experience = window.experience;
+
     this._setRapierWorld();
+    this._setMesh();
+    this._setPane();
   }
+
+  private _experience: Experience;
+
+  public debug: boolean = false;
+
+  private _mesh!: LineSegments;
 
   public instance!: RapierWorld;
 
@@ -12,7 +24,29 @@ export class Physics {
     this.instance = new RapierWorld(gravity);
   };
 
+  private _setMesh = () => {
+    this._mesh = new LineSegments(
+      new BufferGeometry(),
+      new LineBasicMaterial({ color: 0xffffff, vertexColors: true })
+    );
+
+    this._experience.scene.add(this._mesh);
+  };
+
+  private _setPane = () => {
+    const folder = this._experience.debugPane.instance.addFolder({ title: '⚛️ Rapier Physics' });
+    folder.addBinding(this, 'debug', {
+      label: 'Debug',
+    });
+  };
+
   public update = () => {
     this.instance.step();
+
+    const { vertices, colors } = this.instance.debugRender();
+    this._mesh.geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+    this._mesh.geometry.setAttribute('color', new BufferAttribute(colors, 4));
+
+    this._mesh.visible = this.debug;
   };
 }
