@@ -32,7 +32,7 @@ export default class Experience {
     this.world = new World();
 
     // Events
-    this.sizes.addEventListener('resize', this.renderer.resize);
+    this.sizes.addEventListener('resize', this._resize);
     this.time.addEventListener('tick', this._update);
   }
 
@@ -62,5 +62,10 @@ export default class Experience {
     this.camera.update(elapsedTime);
 
     // World
+  };
+
+  private _resize = () => {
+    this.renderer.resize();
+    this.camera.resize();
   };
 }
