@@ -1,5 +1,6 @@
 import { Scene } from 'three';
 import { Camera } from './Camera';
+import { Physics } from './Physics';
 import { Renderer } from './Renderer';
 import { DebugPane, Sizes, Time } from './Utils';
 import { World } from './World';
@@ -29,6 +30,8 @@ export default class Experience {
 
     this.camera = new Camera();
 
+    this.physics = new Physics();
+
     this.world = new World();
 
     // Events
@@ -50,6 +53,8 @@ export default class Experience {
 
   public renderer: Renderer;
 
+  public physics: Physics;
+
   public world: World;
 
   private _update = () => {
@@ -62,6 +67,8 @@ export default class Experience {
     this.camera.update(elapsedTime);
 
     // World
+    this.physics.update();
+    this.world.update();
   };
 
   private _resize = () => {
