@@ -22,7 +22,7 @@ export class Camera {
     this.instance = new PerspectiveCamera(
       75,
       this._experience.sizes.width / this._experience.sizes.height,
-      0.1,
+      0.001,
       1000
     );
 

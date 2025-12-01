@@ -27,9 +27,12 @@ export class Physics {
   private _setMesh = () => {
     this._mesh = new LineSegments(
       new BufferGeometry(),
-      new LineBasicMaterial({ color: 0xffffff, vertexColors: true })
+      new LineBasicMaterial({
+        color: 0xffffff,
+        vertexColors: true,
+      })
     );
-
+    this._mesh.frustumCulled = false;
     this._experience.scene.add(this._mesh);
   };
 

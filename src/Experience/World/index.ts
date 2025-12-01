@@ -13,7 +13,7 @@ export class World extends EventDispatcher {
 
     this.test = new Mesh(
       new SphereGeometry(0.1, 32, 32),
-      new MeshBasicMaterial({ color: '#722ed1', wireframe: true })
+      new MeshBasicMaterial({ color: '#722ed1' })
     );
     this.test.position.set(0, 1, 0);
     this._experience.scene.add(this.test);
