@@ -3,6 +3,7 @@ import { Camera } from './Camera';
 import { Physics } from './Physics';
 import { Renderer } from './Renderer';
 import { DebugPane, Sizes, Time } from './Utils';
+import Resources from './Utils/Resources';
 import { World } from './World';
 
 declare global {
@@ -32,6 +33,8 @@ export default class Experience {
 
     this.physics = new Physics();
 
+    this.resources = new Resources();
+
     this.world = new World();
 
     // Events
@@ -54,6 +57,8 @@ export default class Experience {
   public renderer: Renderer;
 
   public physics: Physics;
+
+  public resources: Resources;
 
   public world: World;
 
