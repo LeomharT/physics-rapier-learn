@@ -218,10 +218,6 @@ export class Car {
     });
 
     // Velocity
-    const FORWARD_VELOCITY = 30.0;
-
-    this._joints.forEach((value) => {
-      value.configureMotorVelocity(FORWARD_VELOCITY, 2.0);
-    });
+    // const FORWARD_VELOCITY = 30.0;
   }
 }

@@ -3,6 +3,7 @@ import { Camera } from './Camera';
 import { Physics } from './Physics';
 import { Renderer } from './Renderer';
 import { DebugPane, Sizes, Time } from './Utils';
+import { KeyboardControls } from './Utils/KeyboardControls';
 import Resources from './Utils/Resources';
 import { World } from './World';
 
@@ -35,6 +36,8 @@ export default class Experience {
 
     this.resources = new Resources();
 
+    this.keyboardControls = new KeyboardControls();
+
     this.world = new World();
 
     // Events
@@ -59,6 +62,8 @@ export default class Experience {
   public physics: Physics;
 
   public resources: Resources;
+
+  public keyboardControls: KeyboardControls;
 
   public world: World;
 
