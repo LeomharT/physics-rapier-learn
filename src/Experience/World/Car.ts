@@ -1,6 +1,5 @@
 import {
   ColliderDesc,
-  ImpulseJoint,
   JointData,
   PrismaticImpulseJoint,
   Vector3 as RapierVector3,
@@ -26,10 +25,10 @@ export class Car {
 
   private _dynamicBodies: [Object3D, RigidBody][] = [];
 
-  private _joints: ImpulseJoint[] = [];
+  private _joints: PrismaticImpulseJoint[] = [];
 
   private _setScene = () => {
-    const carPosition = new Vector3(0, 0.9, 0);
+    const carPosition = new Vector3(0, 0.5, 0);
 
     const rapier = this._experience.physics.instance;
 
@@ -115,6 +114,7 @@ export class Car {
     );
     wheelBLColliderDesc.setTranslation(-0.2, 0, 0);
     wheelBLColliderDesc.setRestitution(0.01);
+    wheelBLColliderDesc.setFriction(3.05);
 
     const wheelBRColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelBRColliderDesc.setRotation(
@@ -122,6 +122,7 @@ export class Car {
     );
     wheelBRColliderDesc.setTranslation(0.2, 0, 0);
     wheelBRColliderDesc.setRestitution(0.01);
+    wheelBLColliderDesc.setFriction(3.05);
 
     const wheelFLColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelFLColliderDesc.setRotation(
@@ -129,6 +130,7 @@ export class Car {
     );
     wheelFLColliderDesc.setTranslation(-0.2, 0, 0);
     wheelFLColliderDesc.setRestitution(0.01);
+    wheelFLColliderDesc.setFriction(3.05);
 
     const wheelFRColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelFRColliderDesc.setRotation(
@@ -136,6 +138,7 @@ export class Car {
     );
     wheelFRColliderDesc.setTranslation(0.2, 0, 0);
     wheelFRColliderDesc.setRestitution(0.01);
+    wheelFRColliderDesc.setFriction(3.05);
 
     rapier.createCollider(carColliderDesc, carBody);
     rapier.createCollider(wheelBLColliderDesc, wheelBLBody);
@@ -158,7 +161,7 @@ export class Car {
       JointData.revolute(
         new RapierVector3(0.55, 0, 0.63),
         new RapierVector3(0, 0, 0),
-        new RapierVector3(1, 0, 0)
+        new RapierVector3(-1, 0, 0)
       ),
       carBody,
       wheelBRBody,
@@ -191,12 +194,11 @@ export class Car {
     this._dynamicBodies.push([wheelFLMesh, wheelFLBody]);
     this._dynamicBodies.push([wheelFRMesh, wheelFRBody]);
 
-    this._joints.push(BLJoint, BRJoint);
-    console.log((BLJoint as PrismaticImpulseJoint).configureMotor);
+    this._joints.push(BLJoint as PrismaticImpulseJoint, BRJoint as PrismaticImpulseJoint);
   };
 
   private _setDebug = () => {
-    const folder = this._experience.debugPane.instance.addFolder({ title: 'Car' });
+    const folder = this._experience.debugPane.instance.addFolder({ title: '🚗 Car' });
   };
 
   private _rotationY: number = 0;
@@ -215,7 +217,11 @@ export class Car {
       mesh.quaternion.copy(rotation);
     });
 
-    const FORWARD_VELOCITY = 15.0; // 较高的速度值
-    const MAX_FORCE = 200.0; // 足够的力矩来克服摩擦和车重
+    // Velocity
+    const FORWARD_VELOCITY = 30.0;
+
+    this._joints.forEach((value) => {
+      value.configureMotorVelocity(FORWARD_VELOCITY, 2.0);
+    });
   }
 }
