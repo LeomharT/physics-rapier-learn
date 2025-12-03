@@ -36,6 +36,7 @@ export class Floor {
 
   private _setMesh = () => {
     this._mesh = new Mesh(this._geometry, this._material);
+    this._mesh.receiveShadow = true;
     this._experience.scene.add(this._mesh);
   };
 

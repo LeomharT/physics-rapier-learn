@@ -2,6 +2,7 @@ import {
   ACESFilmicToneMapping,
   EventDispatcher,
   NoToneMapping,
+  PCFSoftShadowMap,
   ReinhardToneMapping,
   WebGLRenderer,
 } from 'three';
@@ -26,6 +27,8 @@ export class Renderer extends EventDispatcher {
       alpha: true,
       antialias: true,
     });
+    this.instance.shadowMap.enabled = true;
+    this.instance.shadowMap.type = PCFSoftShadowMap;
     this.instance.setClearColor('#211D20');
     this.instance.setSize(this._experience.sizes.width, this._experience.sizes.height);
     this.instance.setPixelRatio(this._experience.sizes.pixelRatio);

@@ -31,5 +31,6 @@ export class World extends EventDispatcher {
 
   public update = () => {
     if (this.testSphere) this.testSphere.update();
+    if (this.car) this.car.update();
   };
 }
