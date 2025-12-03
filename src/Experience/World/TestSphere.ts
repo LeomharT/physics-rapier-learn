@@ -31,7 +31,7 @@ export class TestSphere {
 
   private _setRapier = () => {
     const rigidBodyDesc = RigidBodyDesc.dynamic();
-    rigidBodyDesc.setTranslation(0, 2.0, 0);
+    rigidBodyDesc.setTranslation(1.0, 3.0, -1.0);
 
     this.rigidBody = this._experience.physics.instance.createRigidBody(rigidBodyDesc);
 

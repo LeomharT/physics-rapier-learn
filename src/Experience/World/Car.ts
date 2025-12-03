@@ -1,5 +1,11 @@
-import { ColliderDesc, RigidBody, RigidBodyDesc } from '@dimforge/rapier3d';
-import { Mesh, Object3D, Vector3, type Group } from 'three';
+import {
+  ColliderDesc,
+  JointData,
+  Vector3 as RapierVector3,
+  RigidBody,
+  RigidBodyDesc,
+} from '@dimforge/rapier3d';
+import { Mesh, Object3D, Quaternion, Vector3, type Group } from 'three';
 import type { GLTF } from 'three/examples/jsm/Addons.js';
 import type Experience from '..';
 
@@ -18,6 +24,8 @@ export class Car {
   public _dynamicBodies: [Object3D, RigidBody][] = [];
 
   private _setScene = () => {
+    const carPosition = new Vector3(0, 1, 0);
+
     const rapier = this._experience.physics.instance;
 
     const car = this._resource.scene;
@@ -38,9 +46,6 @@ export class Car {
     wheelFRMesh.position.set(0, 0, 0);
 
     const group = [carMesh, wheelBLMesh, wheelBRMesh, wheelFLMesh, wheelFRMesh];
-    group.forEach((obj) => {
-      obj.scale.setScalar(0.3);
-    });
 
     this._experience.scene.add(...group);
 
@@ -61,18 +66,46 @@ export class Car {
       }
     });
 
+    // Car body
     const carBodyDesc = RigidBodyDesc.dynamic();
-    carBodyDesc.setTranslation(0, 1, 0);
-    carBodyDesc.setCanSleep(false);
+    carBodyDesc.setTranslation(carPosition.x, carPosition.y, carPosition.z);
+    carBodyDesc.setCanSleep(true);
     const carBody = rapier.createRigidBody(carBodyDesc);
+
+    // Whell body
+    const wheelBLBodyDesc = RigidBodyDesc.dynamic();
+    wheelBLBodyDesc.setTranslation(-1 + carPosition.x, 1 + carPosition.y, 1 + carPosition.z);
+    wheelBLBodyDesc.setCanSleep(false);
+    const wheelBLBody = rapier.createRigidBody(wheelBLBodyDesc);
 
     const carColliderDesc = ColliderDesc.convexHull(new Float32Array(positions))!;
     carColliderDesc.setMass(1.0);
     carColliderDesc.setRestitution(0.5);
 
+    const wheelBLColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
+    wheelBLColliderDesc.setRotation(
+      new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 2)
+    );
+    wheelBLColliderDesc.setTranslation(-0.2, 0, 0);
+    wheelBLColliderDesc.setRestitution(0.5);
+
     rapier.createCollider(carColliderDesc, carBody);
+    rapier.createCollider(wheelBLColliderDesc, wheelBLBody);
+
+    // Joints
+    rapier.createImpulseJoint(
+      JointData.revolute(
+        new RapierVector3(-0.55, 0, 0.63),
+        new RapierVector3(0, 0, 0),
+        new RapierVector3(-1, 0, 0)
+      ),
+      carBody,
+      wheelBLBody,
+      true
+    );
 
     this._dynamicBodies.push([carMesh, carBody]);
+    this._dynamicBodies.push([wheelBLMesh, wheelBLBody]);
   };
 
   public update() {
