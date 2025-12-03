@@ -13,7 +13,7 @@ export class Physics {
 
   private _experience: Experience;
 
-  public debug: boolean = false;
+  public debug: boolean = true;
 
   private _mesh!: LineSegments;
 

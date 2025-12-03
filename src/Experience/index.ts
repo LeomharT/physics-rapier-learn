@@ -63,6 +63,8 @@ export default class Experience {
   public world: World;
 
   private _update = () => {
+    this.debugPane.fpsGraph.begin();
+
     const elapsedTime = this.time.clock.getElapsedTime();
 
     // Render
@@ -75,6 +77,8 @@ export default class Experience {
     this.physics.update();
     this.physics.instance.debugRender();
     this.world.update();
+
+    this.debugPane.fpsGraph.end();
   };
 
   private _resize = () => {

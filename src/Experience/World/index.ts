@@ -1,4 +1,4 @@
-import { EventDispatcher } from 'three';
+import { AxesHelper, EventDispatcher } from 'three';
 import Experience from '..';
 import { Car } from './Car';
 import Environment from './Environment';
@@ -17,6 +17,9 @@ export class World extends EventDispatcher {
       this.car = new Car();
       this.testSphere = new TestSphere();
     });
+
+    const axesHelper = new AxesHelper(3);
+    this._experience.scene.add(axesHelper);
   }
 
   private _experience: Experience;

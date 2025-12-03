@@ -1,11 +1,11 @@
 import { ColliderDesc, RigidBodyDesc } from '@dimforge/rapier3d';
-import { BoxGeometry, Mesh, MeshBasicMaterial } from 'three';
+import { BoxGeometry, Material, Mesh, MeshStandardMaterial } from 'three';
 import type Experience from '..';
 
 const box = {
-  hx: 5.0,
+  hx: 20.0,
   hy: 0.1,
-  hz: 5.0,
+  hz: 20.0,
 };
 
 export class Floor {
@@ -20,7 +20,7 @@ export class Floor {
 
   private _geometry!: BoxGeometry;
 
-  private _material!: MeshBasicMaterial;
+  private _material!: Material;
 
   private _mesh!: Mesh;
 
@@ -29,7 +29,7 @@ export class Floor {
   };
 
   private _setMaterial = () => {
-    this._material = new MeshBasicMaterial({
+    this._material = new MeshStandardMaterial({
       color: '#002766',
     });
   };

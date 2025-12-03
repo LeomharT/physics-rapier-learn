@@ -1,6 +1,8 @@
 import {
   ColliderDesc,
+  ImpulseJoint,
   JointData,
+  PrismaticImpulseJoint,
   Vector3 as RapierVector3,
   RigidBody,
   RigidBodyDesc,
@@ -15,16 +17,19 @@ export class Car {
     this._resource = this._experience.resources.items.carModel;
 
     this._setScene();
+    this._setDebug();
   }
 
   private _experience: Experience;
 
   private _resource: GLTF;
 
-  public _dynamicBodies: [Object3D, RigidBody][] = [];
+  private _dynamicBodies: [Object3D, RigidBody][] = [];
+
+  private _joints: ImpulseJoint[] = [];
 
   private _setScene = () => {
-    const carPosition = new Vector3(0, 1, 0);
+    const carPosition = new Vector3(0, 0.9, 0);
 
     const rapier = this._experience.physics.instance;
 
@@ -68,32 +73,78 @@ export class Car {
 
     // Car body
     const carBodyDesc = RigidBodyDesc.dynamic();
+    carBodyDesc.enabled = true;
     carBodyDesc.setTranslation(carPosition.x, carPosition.y, carPosition.z);
     carBodyDesc.setCanSleep(true);
-    const carBody = rapier.createRigidBody(carBodyDesc);
 
     // Whell body
     const wheelBLBodyDesc = RigidBodyDesc.dynamic();
+    wheelBLBodyDesc.enabled = true;
     wheelBLBodyDesc.setTranslation(-1 + carPosition.x, 1 + carPosition.y, 1 + carPosition.z);
     wheelBLBodyDesc.setCanSleep(false);
-    const wheelBLBody = rapier.createRigidBody(wheelBLBodyDesc);
 
+    const wheelBRBodyDesc = RigidBodyDesc.dynamic();
+    wheelBRBodyDesc.enabled = true;
+    wheelBRBodyDesc.setTranslation(1 + carPosition.x, 1 + carPosition.y, 1 - carPosition.z);
+    wheelBRBodyDesc.setCanSleep(false);
+
+    const wheelFLBodyDesc = RigidBodyDesc.dynamic();
+    wheelFLBodyDesc.enabled = true;
+    wheelFLBodyDesc.setTranslation(-1 + carPosition.x, 1 + carPosition.y, -1 + carPosition.z);
+    wheelFLBodyDesc.setCanSleep(false);
+
+    const wheelFRBodyDesc = RigidBodyDesc.dynamic();
+    wheelFRBodyDesc.enabled = true;
+    wheelFRBodyDesc.setTranslation(1 + carPosition.x, 1 + carPosition.y, -1 + carPosition.z);
+    wheelFRBodyDesc.setCanSleep(false);
+
+    const carBody = rapier.createRigidBody(carBodyDesc);
+    const wheelBLBody = rapier.createRigidBody(wheelBLBodyDesc);
+    const wheelBRBody = rapier.createRigidBody(wheelBRBodyDesc);
+    const wheelFLBody = rapier.createRigidBody(wheelFLBodyDesc);
+    const wheelFRBody = rapier.createRigidBody(wheelFRBodyDesc);
+
+    //
     const carColliderDesc = ColliderDesc.convexHull(new Float32Array(positions))!;
-    carColliderDesc.setMass(1.0);
-    carColliderDesc.setRestitution(0.5);
+    carColliderDesc.setMass(0.5);
+    carColliderDesc.setRestitution(0.0);
 
     const wheelBLColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelBLColliderDesc.setRotation(
       new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 2)
     );
     wheelBLColliderDesc.setTranslation(-0.2, 0, 0);
-    wheelBLColliderDesc.setRestitution(0.5);
+    wheelBLColliderDesc.setRestitution(0.01);
+
+    const wheelBRColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
+    wheelBRColliderDesc.setRotation(
+      new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI / 2)
+    );
+    wheelBRColliderDesc.setTranslation(0.2, 0, 0);
+    wheelBRColliderDesc.setRestitution(0.01);
+
+    const wheelFLColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
+    wheelFLColliderDesc.setRotation(
+      new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI / 2)
+    );
+    wheelFLColliderDesc.setTranslation(-0.2, 0, 0);
+    wheelFLColliderDesc.setRestitution(0.01);
+
+    const wheelFRColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
+    wheelFRColliderDesc.setRotation(
+      new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI / 2)
+    );
+    wheelFRColliderDesc.setTranslation(0.2, 0, 0);
+    wheelFRColliderDesc.setRestitution(0.01);
 
     rapier.createCollider(carColliderDesc, carBody);
     rapier.createCollider(wheelBLColliderDesc, wheelBLBody);
+    rapier.createCollider(wheelBRColliderDesc, wheelBRBody);
+    rapier.createCollider(wheelFLColliderDesc, wheelFLBody);
+    rapier.createCollider(wheelFRColliderDesc, wheelFRBody);
 
     // Joints
-    rapier.createImpulseJoint(
+    const BLJoint = rapier.createImpulseJoint(
       JointData.revolute(
         new RapierVector3(-0.55, 0, 0.63),
         new RapierVector3(0, 0, 0),
@@ -103,15 +154,59 @@ export class Car {
       wheelBLBody,
       true
     );
+    const BRJoint = rapier.createImpulseJoint(
+      JointData.revolute(
+        new RapierVector3(0.55, 0, 0.63),
+        new RapierVector3(0, 0, 0),
+        new RapierVector3(1, 0, 0)
+      ),
+      carBody,
+      wheelBRBody,
+      true
+    );
+    rapier.createImpulseJoint(
+      JointData.revolute(
+        new RapierVector3(-0.55, 0, -0.63),
+        new RapierVector3(0, 0, 0),
+        new RapierVector3(-1, 0, 0)
+      ),
+      carBody,
+      wheelFLBody,
+      true
+    );
+    rapier.createImpulseJoint(
+      JointData.revolute(
+        new RapierVector3(0.55, 0, -0.63),
+        new RapierVector3(0, 0, 0),
+        new RapierVector3(1, 0, 0)
+      ),
+      carBody,
+      wheelFRBody,
+      true
+    );
 
     this._dynamicBodies.push([carMesh, carBody]);
     this._dynamicBodies.push([wheelBLMesh, wheelBLBody]);
+    this._dynamicBodies.push([wheelBRMesh, wheelBRBody]);
+    this._dynamicBodies.push([wheelFLMesh, wheelFLBody]);
+    this._dynamicBodies.push([wheelFRMesh, wheelFRBody]);
+
+    this._joints.push(BLJoint, BRJoint);
+    console.log((BLJoint as PrismaticImpulseJoint).configureMotor);
   };
+
+  private _setDebug = () => {
+    const folder = this._experience.debugPane.instance.addFolder({ title: 'Car' });
+  };
+
+  private _rotationY: number = 0;
 
   public update() {
     this._dynamicBodies.forEach((value) => {
       const mesh = value[0];
       const body = value[1];
+
+      this._rotationY += 0.01;
 
       const position = body.translation();
       const rotation = body.rotation();
@@ -119,5 +214,8 @@ export class Car {
       mesh.position.copy(position);
       mesh.quaternion.copy(rotation);
     });
+
+    const FORWARD_VELOCITY = 15.0; // 较高的速度值
+    const MAX_FORCE = 200.0; // 足够的力矩来克服摩擦和车重
   }
 }
