@@ -1,6 +1,7 @@
 import {
   ColliderDesc,
   JointData,
+  MotorModel,
   PrismaticImpulseJoint,
   Vector3 as RapierVector3,
   RigidBody,
@@ -103,10 +104,24 @@ export class Car {
     const wheelFLBody = rapier.createRigidBody(wheelFLBodyDesc);
     const wheelFRBody = rapier.createRigidBody(wheelFRBodyDesc);
 
+    // Axes
+    const axelFLBody = rapier.createRigidBody(
+      RigidBodyDesc.dynamic()
+        .setTranslation(carPosition.x - 0.55, carPosition.y, carPosition.z - 0.63)
+        .setCanSleep(false)
+    );
+    const axelFRBody = rapier.createRigidBody(
+      RigidBodyDesc.dynamic()
+        .setTranslation(carPosition.x + 0.55, carPosition.y, carPosition.z - 0.63)
+        .setCanSleep(false)
+    );
+
     //
     const carColliderDesc = ColliderDesc.convexHull(new Float32Array(positions))!;
-    carColliderDesc.setMass(0.5);
+    carColliderDesc.setMass(1.0);
     carColliderDesc.setRestitution(0.0);
+    carColliderDesc.setFriction(3);
+    carColliderDesc.setCollisionGroups(131073);
 
     const wheelBLColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelBLColliderDesc.setRotation(
@@ -114,7 +129,8 @@ export class Car {
     );
     wheelBLColliderDesc.setTranslation(-0.2, 0, 0);
     wheelBLColliderDesc.setRestitution(0.01);
-    wheelBLColliderDesc.setFriction(3.05);
+    wheelBLColliderDesc.setFriction(2);
+    wheelBLColliderDesc.setCollisionGroups(262145);
 
     const wheelBRColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelBRColliderDesc.setRotation(
@@ -122,7 +138,8 @@ export class Car {
     );
     wheelBRColliderDesc.setTranslation(0.2, 0, 0);
     wheelBRColliderDesc.setRestitution(0.01);
-    wheelBLColliderDesc.setFriction(3.05);
+    wheelBRColliderDesc.setFriction(2);
+    wheelBRColliderDesc.setCollisionGroups(262145);
 
     const wheelFLColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelFLColliderDesc.setRotation(
@@ -130,7 +147,8 @@ export class Car {
     );
     wheelFLColliderDesc.setTranslation(-0.2, 0, 0);
     wheelFLColliderDesc.setRestitution(0.01);
-    wheelFLColliderDesc.setFriction(3.05);
+    wheelFLColliderDesc.setFriction(2.5);
+    wheelFLColliderDesc.setCollisionGroups(262145);
 
     const wheelFRColliderDesc = ColliderDesc.cylinder(0.1, 0.3);
     wheelFRColliderDesc.setRotation(
@@ -138,63 +156,115 @@ export class Car {
     );
     wheelFRColliderDesc.setTranslation(0.2, 0, 0);
     wheelFRColliderDesc.setRestitution(0.01);
-    wheelFRColliderDesc.setFriction(3.05);
+    wheelFRColliderDesc.setFriction(2.5);
+    wheelFRColliderDesc.setCollisionGroups(262145);
+
+    // Axle of the front wheel
+    const axelFLShape = ColliderDesc.cuboid(0.1, 0.1, 0.1)
+      .setRotation(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI / 2))
+      .setMass(0.1)
+      .setCollisionGroups(589823);
+    const axelFRShape = ColliderDesc.cuboid(0.1, 0.1, 0.1)
+      .setRotation(new Quaternion().setFromAxisAngle(new Vector3(0, 0, 1), Math.PI / 2))
+      .setMass(0.1)
+      .setCollisionGroups(589823);
 
     rapier.createCollider(carColliderDesc, carBody);
     rapier.createCollider(wheelBLColliderDesc, wheelBLBody);
     rapier.createCollider(wheelBRColliderDesc, wheelBRBody);
     rapier.createCollider(wheelFLColliderDesc, wheelFLBody);
     rapier.createCollider(wheelFRColliderDesc, wheelFRBody);
+    rapier.createCollider(axelFLShape, axelFLBody);
+    rapier.createCollider(axelFRShape, axelFRBody);
+
+    const frontAxis = new RapierVector3(1, 0, 0);
+    const backAxis = new RapierVector3(-1, 0, 0);
+    const anchor2 = new RapierVector3(0, 0, 0);
 
     // Joints
-    const BLJoint = rapier.createImpulseJoint(
-      JointData.revolute(
-        new RapierVector3(-0.55, 0, 0.63),
-        new RapierVector3(0, 0, 0),
-        new RapierVector3(-1, 0, 0)
-      ),
+    rapier.createImpulseJoint(
+      JointData.revolute(new RapierVector3(-0.55, 0, 0.63), anchor2, backAxis),
       carBody,
       wheelBLBody,
       true
     );
-    const BRJoint = rapier.createImpulseJoint(
-      JointData.revolute(
-        new RapierVector3(0.55, 0, 0.63),
-        new RapierVector3(0, 0, 0),
-        new RapierVector3(-1, 0, 0)
-      ),
+    rapier.createImpulseJoint(
+      JointData.revolute(new RapierVector3(0.55, 0, 0.63), anchor2, backAxis),
       carBody,
       wheelBRBody,
       true
     );
-    rapier.createImpulseJoint(
-      JointData.revolute(
-        new RapierVector3(-0.55, 0, -0.63),
-        new RapierVector3(0, 0, 0),
-        new RapierVector3(-1, 0, 0)
-      ),
-      carBody,
-      wheelFLBody,
-      true
-    );
-    rapier.createImpulseJoint(
-      JointData.revolute(
-        new RapierVector3(0.55, 0, -0.63),
-        new RapierVector3(0, 0, 0),
-        new RapierVector3(1, 0, 0)
-      ),
-      carBody,
-      wheelFRBody,
-      true
-    );
+    // rapier.createImpulseJoint(
+    //   JointData.revolute(new RapierVector3(-0.55, 0, -0.63), anchor2, frontAxis),
+    //   carBody,
+    //   wheelFLBody,
+    //   true
+    // );
+    // rapier.createImpulseJoint(
+    //   JointData.revolute(new RapierVector3(0.55, 0, -0.63), anchor2, frontAxis),
+    //   carBody,
+    //   wheelFRBody,
+    //   true
+    // );
 
     this._dynamicBodies.push([carMesh, carBody]);
     this._dynamicBodies.push([wheelBLMesh, wheelBLBody]);
     this._dynamicBodies.push([wheelBRMesh, wheelBRBody]);
     this._dynamicBodies.push([wheelFLMesh, wheelFLBody]);
     this._dynamicBodies.push([wheelFRMesh, wheelFRBody]);
+    this._dynamicBodies.push([new Object3D(), axelFRBody]);
+    this._dynamicBodies.push([new Object3D(), axelFLBody]);
 
-    this._joints.push(BLJoint as PrismaticImpulseJoint, BRJoint as PrismaticImpulseJoint);
+    // Motor
+    const wheelBLMotor = rapier.createImpulseJoint(
+      JointData.revolute(new Vector3(-0.55, 0, 0.63), new Vector3(0, 0, 0), new Vector3(-1, 0, 0)),
+      carBody,
+      wheelBLBody,
+      true
+    );
+    const wheelBRMotor = rapier.createImpulseJoint(
+      JointData.revolute(new Vector3(0.55, 0, 0.63), new Vector3(0, 0, 0), new Vector3(-1, 0, 0)),
+      carBody,
+      wheelBRBody,
+      true
+    );
+    // attach steering axels to car. These will be configurable motors.
+    const wheelFLAxel = rapier.createImpulseJoint(
+      JointData.revolute(new Vector3(-0.55, 0, -0.63), new Vector3(0, 0, 0), new Vector3(0, 1, 0)),
+      carBody,
+      axelFLBody,
+      true
+    );
+    (wheelFLAxel as PrismaticImpulseJoint).configureMotorModel(MotorModel.ForceBased);
+
+    const wheelFRAxel = rapier.createImpulseJoint(
+      JointData.revolute(new Vector3(0.55, 0, -0.63), new Vector3(0, 0, 0), new Vector3(0, 1, 0)),
+      carBody,
+      axelFRBody,
+      true
+    );
+    (wheelFRAxel as PrismaticImpulseJoint).configureMotorModel(MotorModel.ForceBased);
+
+    // attach front wheel to steering axels
+    rapier.createImpulseJoint(
+      JointData.revolute(new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 0, 0)),
+      axelFLBody,
+      wheelFLBody,
+      true
+    );
+    rapier.createImpulseJoint(
+      JointData.revolute(new Vector3(0, 0, 0), new Vector3(0, 0, 0), new Vector3(1, 0, 0)),
+      axelFRBody,
+      wheelFRBody,
+      true
+    );
+
+    this._joints.push(
+      wheelBLMotor as PrismaticImpulseJoint,
+      wheelBRMotor as PrismaticImpulseJoint,
+      wheelFLAxel as PrismaticImpulseJoint,
+      wheelFRAxel as PrismaticImpulseJoint
+    );
   };
 
   private _setDebug = () => {
@@ -227,5 +297,16 @@ export class Car {
       this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 0.0);
       this._joints[1].configureMotorVelocity(FORWARD_VELOCITY, 0.0);
     }
+
+    let targetSteer = 0;
+    if (this._experience.keyboardControls.state.left) {
+      targetSteer += 0.6;
+    }
+    if (this._experience.keyboardControls.state.right) {
+      targetSteer -= 0.6;
+    }
+    (this._joints[2] as PrismaticImpulseJoint).configureMotorPosition(targetSteer, 100, 10.0);
+
+    (this._joints[3] as PrismaticImpulseJoint).configureMotorPosition(targetSteer, 100, 10.0);
   }
 }

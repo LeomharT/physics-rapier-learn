@@ -10,6 +10,8 @@ const Controls = {
 const KeyboardKey: Record<string, string> = {
   w: 'KeyW',
   s: 'KeyS',
+  a: 'KeyA',
+  d: 'KeyD',
 };
 
 export class KeyboardControls extends EventDispatcher {
@@ -34,6 +36,8 @@ export class KeyboardControls extends EventDispatcher {
   public map = [
     { name: Controls.forward, keys: ['KeyW'] },
     { name: Controls.back, keys: ['KeyS'] },
+    { name: Controls.left, keys: ['KeyA'] },
+    { name: Controls.right, keys: ['KeyD'] },
   ];
 
   public state: Record<string, boolean> = {};
