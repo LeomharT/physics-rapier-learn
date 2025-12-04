@@ -201,14 +201,10 @@ export class Car {
     const folder = this._experience.debugPane.instance.addFolder({ title: '🚗 Car' });
   };
 
-  private _rotationY: number = 0;
-
   public update() {
     this._dynamicBodies.forEach((value) => {
       const mesh = value[0];
       const body = value[1];
-
-      this._rotationY += 0.01;
 
       const position = body.translation();
       const rotation = body.rotation();
@@ -221,11 +217,14 @@ export class Car {
       console.log(this._experience.keyboardControls.state);
 
       // Velocity
-      const FORWARD_VELOCITY = 30.0;
+      const FORWARD_VELOCITY = 50.0;
+      this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
+    } else if (this._experience.keyboardControls.state.back) {
+      const FORWARD_VELOCITY = -50.0;
       this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
     } else {
       const FORWARD_VELOCITY = 0.0;
-      this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
+      this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 0.0);
     }
   }
 }
