@@ -182,18 +182,18 @@ export class Car {
     const anchor2 = new RapierVector3(0, 0, 0);
 
     // Joints
-    rapier.createImpulseJoint(
-      JointData.revolute(new RapierVector3(-0.55, 0, 0.63), anchor2, backAxis),
-      carBody,
-      wheelBLBody,
-      true
-    );
-    rapier.createImpulseJoint(
-      JointData.revolute(new RapierVector3(0.55, 0, 0.63), anchor2, backAxis),
-      carBody,
-      wheelBRBody,
-      true
-    );
+    // rapier.createImpulseJoint(
+    //   JointData.revolute(new RapierVector3(-0.55, 0, 0.63), anchor2, backAxis),
+    //   carBody,
+    //   wheelBLBody,
+    //   true
+    // );
+    // rapier.createImpulseJoint(
+    //   JointData.revolute(new RapierVector3(0.55, 0, 0.63), anchor2, backAxis),
+    //   carBody,
+    //   wheelBRBody,
+    //   true
+    // );
     // rapier.createImpulseJoint(
     //   JointData.revolute(new RapierVector3(-0.55, 0, -0.63), anchor2, frontAxis),
     //   carBody,
@@ -285,11 +285,11 @@ export class Car {
 
     if (this._experience.keyboardControls.state.forward) {
       // Velocity
-      const FORWARD_VELOCITY = 50.0;
+      const FORWARD_VELOCITY = 250.0;
       this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
       this._joints[1].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
     } else if (this._experience.keyboardControls.state.back) {
-      const FORWARD_VELOCITY = -50.0;
+      const FORWARD_VELOCITY = -150.0;
       this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
       this._joints[1].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
     } else {
