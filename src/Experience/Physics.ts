@@ -19,9 +19,10 @@ export class Physics {
 
   public instance!: RapierWorld;
 
+  public gravity = { x: 0.0, y: -9.81, z: 0.0 };
+
   private _setRapierWorld = () => {
-    const gravity = { x: 0.0, y: -9.81, z: 0.0 };
-    this.instance = new RapierWorld(gravity);
+    this.instance = new RapierWorld(this.gravity);
   };
 
   private _setMesh = () => {
@@ -40,6 +41,12 @@ export class Physics {
     const folder = this._experience.debugPane.instance.addFolder({ title: '⚛️ Rapier Physics' });
     folder.addBinding(this, 'debug', {
       label: 'Debug',
+    });
+    folder.addBinding(this.gravity, 'y', {
+      label: 'Gravity Y',
+      step: 0.001,
+      min: -10,
+      max: 10,
     });
   };
 
