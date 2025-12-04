@@ -214,17 +214,18 @@ export class Car {
     });
 
     if (this._experience.keyboardControls.state.forward) {
-      console.log(this._experience.keyboardControls.state);
-
       // Velocity
       const FORWARD_VELOCITY = 50.0;
       this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
+      this._joints[1].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
     } else if (this._experience.keyboardControls.state.back) {
       const FORWARD_VELOCITY = -50.0;
       this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
+      this._joints[1].configureMotorVelocity(FORWARD_VELOCITY, 2.0);
     } else {
       const FORWARD_VELOCITY = 0.0;
       this._joints[0].configureMotorVelocity(FORWARD_VELOCITY, 0.0);
+      this._joints[1].configureMotorVelocity(FORWARD_VELOCITY, 0.0);
     }
   }
 }
