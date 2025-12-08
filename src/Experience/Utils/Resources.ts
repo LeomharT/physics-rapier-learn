@@ -1,4 +1,4 @@
-import { EventDispatcher } from 'three';
+import { EventDispatcher, Texture, TextureLoader } from 'three';
 import { GLTFLoader, type GLTF } from 'three/examples/jsm/Addons.js';
 
 const sources = [
@@ -7,14 +7,21 @@ const sources = [
     type: 'gltf',
     path: 'sedanSports.glb',
   },
+  {
+    name: 'noiseTexture',
+    type: 'texture',
+    path: 'noiseTexture.png',
+  },
 ] as const;
 
 export type ResourcesLoaders = {
   gltfLoader: GLTFLoader;
+  textureLoader: TextureLoader;
 };
 
 export type ResourcesItems = {
   carModel: GLTF;
+  noiseTexture: Texture;
 };
 
 export type ResourcesEvents = {
@@ -40,6 +47,9 @@ export default class Resources extends EventDispatcher<ResourcesEvents> {
   private _setLoaders() {
     this.loaders.gltfLoader = new GLTFLoader();
     this.loaders.gltfLoader.setPath('/assets/models/');
+
+    this.loaders.textureLoader = new TextureLoader();
+    this.loaders.textureLoader.setPath('/assets/texture/');
   }
 
   private _startLoading() {
@@ -47,6 +57,12 @@ export default class Resources extends EventDispatcher<ResourcesEvents> {
       switch (source.type) {
         case 'gltf': {
           this.loaders.gltfLoader.load(source.path, (data) => {
+            this._sourceLoaded(source, data);
+          });
+          break;
+        }
+        case 'texture': {
+          this.loaders.textureLoader.load(source.path, (data) => {
             this._sourceLoaded(source, data);
           });
           break;

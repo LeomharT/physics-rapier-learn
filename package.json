@@ -19,6 +19,7 @@
     "@dimforge/rapier3d": "^0.19.3",
     "@tweakpane/plugin-essentials": "^0.2.1",
     "three": "^0.181.2",
+    "three-custom-shader-material": "^5.1.0",
     "tweakpane": "^4.0.5"
   }
 }
