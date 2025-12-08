@@ -181,7 +181,7 @@ export class Car {
     const backAxis = new RapierVector3(-1, 0, 0);
     const anchor2 = new RapierVector3(0, 0, 0);
 
-    // Joints
+    // Joints Fixed
     // rapier.createImpulseJoint(
     //   JointData.revolute(new RapierVector3(-0.55, 0, 0.63), anchor2, backAxis),
     //   carBody,
