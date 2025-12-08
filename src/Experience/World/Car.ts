@@ -215,7 +215,7 @@ export class Car {
     this._dynamicBodies.push([new Object3D(), axelFRBody]);
     this._dynamicBodies.push([new Object3D(), axelFLBody]);
 
-    // Motor
+    // Motor joints
     const wheelBLMotor = rapier.createImpulseJoint(
       JointData.revolute(new Vector3(-0.55, 0, 0.63), new Vector3(0, 0, 0), new Vector3(-1, 0, 0)),
       carBody,
@@ -300,10 +300,10 @@ export class Car {
 
     let targetSteer = 0;
     if (this._experience.keyboardControls.state.left) {
-      targetSteer += 0.6;
+      targetSteer += 0.5;
     }
     if (this._experience.keyboardControls.state.right) {
-      targetSteer -= 0.6;
+      targetSteer -= 0.5;
     }
     (this._joints[2] as PrismaticImpulseJoint).configureMotorPosition(targetSteer, 100, 10.0);
 
